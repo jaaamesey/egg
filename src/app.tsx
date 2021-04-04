@@ -1,8 +1,9 @@
 import React from 'react';
 import { BrowserRouter, Switch, Route } from 'react-router-dom';
-import { EggCanvas } from './ui/base/egg_canvas';
 import { TopMenu } from './ui/top_menu';
 import { BottomMenu } from './ui/bottom_menu';
+
+const EggCanvas = React.lazy(() => import('./ui/base/egg_canvas'));
 
 const App = () => {
   return (
@@ -16,8 +17,7 @@ const App = () => {
               maxWidth: '100%',
               gridTemplateColumns: '1fr',
               gridTemplateRows: '1fr',
-              backgroundImage:
-                'url(https://imagesvc.meredithcorp.io/v3/mm/image?url=https%3A%2F%2Fstatic.onecms.io%2Fwp-content%2Fuploads%2Fsites%2F28%2F2017%2F07%2Fel-yunque-national-rainforest-tropical-puerto-rico-TROPICALPLANTS0617.jpg)',
+              background: 'linear-gradient(to bottom, #ffefba, #ffffff)',
             }}
           >
             <div
@@ -29,7 +29,9 @@ const App = () => {
                 overflow: 'hidden',
               }}
             >
-              <EggCanvas />
+              <React.Suspense fallback={<div />}>
+                <EggCanvas />
+              </React.Suspense>
             </div>
             <div
               className="h-full flex flex-col justify-between"

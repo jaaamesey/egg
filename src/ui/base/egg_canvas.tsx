@@ -1,38 +1,62 @@
-import type * as THREE from 'three';
-
 import React from 'react';
-import { Canvas, useFrame } from '@react-three/fiber';
+import { FreeCamera, Vector3, HemisphericLight, MeshBuilder, Mesh, Scene } from '@babylonjs/core';
+import SceneComponent from 'babylonjs-hook';
+import './egg_canvas.css';
 
-export const Egg = () => {
-  // This reference will give us direct access to the mesh
-  const mesh = React.useRef<THREE.Mesh>();
-  // Set up state for the hovered and active state
-  const [hovered, setHover] = React.useState(false);
-  const [active, setActive] = React.useState(false);
-  // Rotate mesh every frame, this is outside of React without overhead
-  useFrame((state, delta) => mesh?.current && (mesh.current.rotation.x += 0.01));
-  // Return view, these are regular threejs elements expressed in JSX
+let box: Mesh;
+
+const onSceneReady = (scene: Scene) => {
+  const camera = new FreeCamera('camera1', new Vector3(0, 5, -10), scene);
+  camera.setTarget(Vector3.Zero());
+
+  const canvas = scene.getEngine().getRenderingCanvas();
+  camera.attachControl(canvas, true);
+  if (!canvas) {
+    const message = 'Canvas is missing. This should never happen.';
+    alert(message);
+    throw Error(message);
+  }
+  canvas.classList.add('loaded');
+
+  // This creates a light, aiming 0,1,0 - to the sky (non-mesh)
+  const light = new HemisphericLight('light', new Vector3(0, 1, 0), scene);
+
+  // Default intensity is 1. Let's dim the light a small amount
+  light.intensity = 0.7;
+
+  // Our built-in 'box' shape.
+  box = MeshBuilder.CreateBox('box', { size: 2 }, scene);
+
+  // Move the box upward 1/2 its height
+  box.position.y = 1;
+
+  // Our built-in 'ground' shape.
+  MeshBuilder.CreateGround('ground', { width: 6, height: 6 }, scene);
+};
+
+/**
+ * Will run on every frame render.  We are spinning the box on y-axis.
+ */
+const onRender = (scene: Scene) => {
+  if (box !== undefined) {
+    const deltaTimeInMillis = scene.getEngine().getDeltaTime();
+
+    const rpm = 10;
+    box.rotation.y += (rpm / 60) * Math.PI * 2 * (deltaTimeInMillis / 1000);
+  }
+  scene.getEngine().resize();
+};
+
+const EggCanvas = () => {
   return (
-    <mesh
-      ref={mesh}
-      scale={active ? 1.5 : 1}
-      onClick={(event) => setActive(!active)}
-      onPointerOver={(event) => setHover(true)}
-      onPointerOut={(event) => setHover(false)}
-    >
-      <boxGeometry args={[1, 1, 1]} />
-      <meshStandardMaterial color={hovered ? 'hotpink' : 'orange'} />
-    </mesh>
+    <SceneComponent
+      antialias
+      adaptToDeviceRatio
+      onSceneReady={onSceneReady}
+      onRender={onRender}
+      id="egg-canvas"
+    />
   );
 };
 
-export const EggCanvas = () => {
-  return (
-    <div style={{ height: '100%' }}>
-      <Canvas>
-        <ambientLight />
-        <Egg />
-      </Canvas>
-    </div>
-  );
-};
+export default EggCanvas;

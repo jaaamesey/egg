@@ -7,7 +7,8 @@
     "serve": "vite preview"
   },
   "dependencies": {
-    "@react-three/fiber": "^6.0.7",
+    "@babylonjs/core": "^4.2.0",
+    "babylonjs-hook": "^0.1.0-beta.0",
     "mobx": "^6.1.8",
     "mobx-react-lite": "^3.2.0",
     "react": "^17.0.2",
