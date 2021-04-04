@@ -1,27 +1,22 @@
 import React from 'react';
 import {
-  FreeCamera,
   Vector3,
-  Mesh,
   Scene,
   PBRMetallicRoughnessMaterial,
   CubeTexture,
   SceneLoader,
   Texture,
   ArcRotateCamera,
-  DeviceOrientationCamera,
-  TouchCamera,
 } from '@babylonjs/core';
-import '@babylonjs/loaders';
+import '@babylonjs/loaders/glTF';
 import SceneComponent from 'babylonjs-hook';
+
 import ForestEnv from '../../envs/forest.env?url';
 import EggOBJ from '../../models/egg/egg.glb?url';
 import EggNormals from '../../models/egg/normal.jpg';
 import EggRoughness from '../../models/egg/roughness.jpg';
 import EggAlbedo from '../../models/egg/albedo.jpg';
 import './egg_canvas.css';
-
-let box: Mesh;
 
 SceneLoader.ShowLoadingScreen = false;
 
@@ -59,16 +54,7 @@ const onSceneReady = (scene: Scene) => {
   });
 };
 
-/**
- * Will run on every frame render.  We are spinning the box on y-axis.
- */
 const onRender = (scene: Scene) => {
-  if (box !== undefined) {
-    const deltaTimeInMillis = scene.getEngine().getDeltaTime();
-
-    const rpm = 10;
-    box.rotation.y += (rpm / 60) * Math.PI * 2 * (deltaTimeInMillis / 1000);
-  }
   scene.getEngine().resize();
 };
 
