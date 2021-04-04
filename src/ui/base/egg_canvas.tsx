@@ -1,12 +1,13 @@
 import React from 'react';
-import { CubeTexture, Texture } from '@babylonjs/core/Materials/Textures';
+import { CubeTexture } from '@babylonjs/core/Materials/Textures/cubeTexture';
+import { Texture } from '@babylonjs/core/Materials/Textures/texture';
 import { PBRMetallicRoughnessMaterial } from '@babylonjs/core/Materials/PBR/pbrMetallicRoughnessMaterial';
 import { ArcRotateCamera } from '@babylonjs/core/Cameras/arcRotateCamera';
 import { Vector3 } from '@babylonjs/core/Maths/math.vector';
-import { SceneLoader } from '@babylonjs/core/Loading';
+import { SceneLoader } from '@babylonjs/core/Loading/sceneLoader';
 import type { Scene } from '@babylonjs/core/scene';
-import '@babylonjs/core/Helpers';
-import '@babylonjs/loaders/glTF/2.0';
+import '@babylonjs/core/Helpers/sceneHelpers';
+import '@babylonjs/loaders/glTF/2.0/Extensions/KHR_draco_mesh_compression';
 import SceneComponent from 'babylonjs-hook';
 
 import ForestEnv from '../../envs/forest.env?url';
