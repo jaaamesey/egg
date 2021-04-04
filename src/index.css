@@ -1,27 +1,48 @@
 @import 'tailwindcss/base';
-
 @import 'tailwindcss/components';
-
 @import 'tailwindcss/utilities';
+
+@import url('https://fonts.googleapis.com/css?family=Comic Neue');
 
 :root {
   --simulated-phone-width: 500px;
   --simulated-phone-height: 1000px;
-  --white: #ffffff;
+
+  font-family: 'Comic Neue', 'Comic Sans MS', sans-serif;
+  font-weight: bold;
 }
 
-.appContainer {
+html,
+body,
+#root {
+  height: 100%;
+  overflow: hidden;
+  overscroll-behavior: none;
+  user-select: none;
+}
+
+.app-container {
   width: 100%;
   background-color: white;
 }
 
+.glass-pane {
+  color: rgba(0, 0, 0, 0.5);
+
+  background-color: rgba(255, 255, 255, 0.8);
+  box-sizing: content-box;
+  box-shadow: inset 0px 0px 1px 1px rgba(0, 0, 0, 0.2),
+    inset 0px 1px 1px 1px rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(6px);
+}
+
 @media screen and (min-width: 800px) {
-  .appContainer {
+  .app-container {
     max-width: var(--simulated-phone-width);
     max-height: var(--simulated-phone-height);
     margin: 20px 0;
-    border: solid rgba(0, 0, 0, 0.2);
-    border-radius: 6px;
-    background-clip: padding-box;
+    border: solid 4px rgba(0, 0, 0, 0.2);
+    border-radius: 8px;
+    background-clip: content-box;
   }
 }
