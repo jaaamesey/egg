@@ -3,3 +3,25 @@
 @import 'tailwindcss/components';
 
 @import 'tailwindcss/utilities';
+
+:root {
+  --simulated-phone-width: 500px;
+  --simulated-phone-height: 1000px;
+  --white: #ffffff;
+}
+
+.appContainer {
+  width: 100%;
+  background-color: white;
+}
+
+@media screen and (min-width: 800px) {
+  .appContainer {
+    max-width: var(--simulated-phone-width);
+    max-height: var(--simulated-phone-height);
+    margin: 20px 0;
+    border: solid rgba(0, 0, 0, 0.2);
+    border-radius: 6px;
+    background-clip: padding-box;
+  }
+}
