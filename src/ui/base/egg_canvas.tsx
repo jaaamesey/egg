@@ -1,14 +1,12 @@
 import React from 'react';
-import {
-  Vector3,
-  Scene,
-  PBRMetallicRoughnessMaterial,
-  CubeTexture,
-  SceneLoader,
-  Texture,
-  ArcRotateCamera,
-} from '@babylonjs/core';
-import '@babylonjs/loaders/glTF';
+import { CubeTexture, Texture } from '@babylonjs/core/Materials/Textures';
+import { PBRMetallicRoughnessMaterial } from '@babylonjs/core/Materials/PBR/pbrMetallicRoughnessMaterial';
+import { ArcRotateCamera } from '@babylonjs/core/Cameras/arcRotateCamera';
+import { Vector3 } from '@babylonjs/core/Maths/math.vector';
+import { SceneLoader } from '@babylonjs/core/Loading';
+import type { Scene } from '@babylonjs/core/scene';
+import '@babylonjs/core/Helpers';
+import '@babylonjs/loaders/glTF/2.0';
 import SceneComponent from 'babylonjs-hook';
 
 import ForestEnv from '../../envs/forest.env?url';
