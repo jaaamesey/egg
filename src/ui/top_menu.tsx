@@ -30,7 +30,7 @@ export const TopMenu = () => {
         <ARIcon fill="black" fillOpacity={0.5} />
       </div>
       <div>
-        {hours % 12}
+        {hours === 0 ? 12 : hours % 12}
         <span>:</span>
         {minutes < 10 && '0'}
         {minutes}
