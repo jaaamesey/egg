@@ -60,7 +60,7 @@ export const TopMenu = ({ ar, onARClicked }: { ar: boolean; onARClicked: () => v
       <IconButton Icon={ARIcon} active={ar} onClick={onARClicked} />
       <div>
         {hours === 0 || hours === 12 ? 12 : hours % 12}
-        <span>:</span>
+        <span className="animate-pulse">:</span>
         {minutes < 10 && 0}
         {minutes}
         {ampm}
