@@ -1,6 +1,5 @@
 import React from 'react';
-import '@material/ripple/dist/mdc.ripple.min.css';
-import { MDCRipple } from '@material/ripple';
+import { MDCRipple } from '@material/ripple/component';
 import { FaUtensilSpoon as SpoonIcon } from 'react-icons/fa';
 import { IoMdEgg as EggIcon, IoMdBrush as BrushIcon } from 'react-icons/io';
 import classNames from 'classnames';
