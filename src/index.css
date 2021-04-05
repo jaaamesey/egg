@@ -19,6 +19,7 @@ body,
   overflow: hidden;
   overscroll-behavior: none;
   user-select: none;
+  touch-action: manipulation;
 }
 
 .app-container {

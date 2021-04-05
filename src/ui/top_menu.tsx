@@ -32,7 +32,7 @@ export const TopMenu = () => {
       <div>
         {hours === 0 || hours === 12 ? 12 : hours % 12}
         <span>:</span>
-        {minutes < 10 && '0'}
+        {minutes < 10 && 0}
         {minutes}
         {ampm}
       </div>
