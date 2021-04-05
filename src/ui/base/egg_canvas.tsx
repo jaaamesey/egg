@@ -4,6 +4,7 @@ import { Texture } from '@babylonjs/core/Materials/Textures/texture';
 import { VideoTexture } from '@babylonjs/core/Materials/Textures/videoTexture';
 import { PBRMetallicRoughnessMaterial } from '@babylonjs/core/Materials/PBR/pbrMetallicRoughnessMaterial';
 import { ArcRotateCamera } from '@babylonjs/core/Cameras/arcRotateCamera';
+import { Color4 } from '@babylonjs/core/Maths/math.color';
 import { Vector3 } from '@babylonjs/core/Maths/math.vector';
 import { SceneLoader } from '@babylonjs/core/Loading/sceneLoader';
 import { Layer } from '@babylonjs/core/Layers/layer';
@@ -21,9 +22,19 @@ import './egg_canvas.css';
 
 SceneLoader.ShowLoadingScreen = false;
 
-const onSceneReady = (scene: Scene) => {
-  const hdr = new CubeTexture(ForestEnv, scene);
+let videoStream: MediaStream | null = null;
 
+const clearVideoStream = () => {
+  videoStream?.getVideoTracks().forEach((track) => {
+    track.stop();
+    track.enabled = false;
+  });
+};
+
+const onSceneReady = (scene: Scene) => {
+  scene.clearColor = new Color4(1, 1, 1, 1);
+
+  const hdr = new CubeTexture(ForestEnv, scene);
   const skyboxMesh = scene.createDefaultSkybox(hdr, true, 1000, 0.088, true);
   if (!skyboxMesh) throw new Error('Could not get skybox mesh');
 
@@ -66,13 +77,32 @@ const onSceneReady = (scene: Scene) => {
 type SceneData = ReturnType<typeof onSceneReady>;
 
 const onAREnabled = ({ scene, skyboxMesh, bgLayer }: SceneData) => {
+  clearVideoStream();
   skyboxMesh.visibility = 0;
-  VideoTexture.CreateFromWebCamAsync(scene, { advanced: [{ facingMode: 'environment' }] } as any)
-    .then((videoTexture) => {
-      bgLayer.texture = videoTexture;
-      bgLayer.texture.vScale = -1;
+  navigator.mediaDevices
+    .getUserMedia({ video: { facingMode: 'environment' } })
+    .then((stream) => {
+      clearVideoStream(); // In case the previous stream never closed properly (not sure if this is still possible)
+      videoStream = stream;
+      // If AR was disabled in this time (detected by checking skybox visibility), close the stream and exit.
+      if (skyboxMesh.visibility === 1) {
+        clearVideoStream();
+        return;
+      }
+      VideoTexture.CreateFromStreamAsync(scene, stream)
+        .then((videoTexture) => {
+          bgLayer.texture = videoTexture;
+          bgLayer.texture.vScale = -1;
+        })
+        .catch((e) => alert('Failed to create video texture: ' + e));
     })
     .catch((e) => alert('Unable to access camera: ' + e));
+};
+
+const onARDisabled = ({ skyboxMesh, bgLayer }: SceneData) => {
+  skyboxMesh.visibility = 1;
+  bgLayer.texture = null;
+  clearVideoStream();
 };
 
 const onRender = (scene: Scene) => {
@@ -85,6 +115,8 @@ const EggCanvas = ({ ar }: { ar?: boolean }) => {
     if (sceneData) {
       if (ar) {
         onAREnabled(sceneData);
+      } else {
+        onARDisabled(sceneData);
       }
     }
   }, [ar, sceneData]);
