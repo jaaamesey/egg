@@ -31,7 +31,12 @@ const clearVideoStream = () => {
   });
 };
 
-const onSceneReady = (scene: Scene) => {
+let lastOrientationEvent: DeviceOrientationEvent;
+window.addEventListener('deviceorientation', (event) => {
+  lastOrientationEvent = event;
+});
+
+const onSceneReady = async (scene: Scene) => {
   scene.clearColor = new Color4(1, 1, 1, 1);
 
   const hdr = new CubeTexture(ForestEnv, scene);
@@ -57,27 +62,29 @@ const onSceneReady = (scene: Scene) => {
   mat.roughness = 0.3;
 
   const scale = 0.3;
-  SceneLoader.ImportMeshAsync('', EggOBJ).then(({ meshes }) => {
-    const egg = meshes[1];
-    egg.position.y = -1.25;
-    egg.scaling = new Vector3(scale, scale, scale);
-    egg.material = mat;
-    if (!canvas) {
-      const message = 'Canvas is missing. This should never happen.';
-      alert(message);
-      throw Error(message);
-    }
-    canvas.classList.add('loaded');
-  });
+  const { meshes } = await SceneLoader.ImportMeshAsync('', EggOBJ);
+  const egg = meshes[1];
+  egg.position.y = -1.25;
+  egg.scaling = new Vector3(scale, scale, scale);
+  egg.material = mat;
+  if (!canvas) {
+    const message = 'Canvas is missing. This should never happen.';
+    alert(message);
+    throw Error(message);
+  }
+  canvas.classList.add('loaded');
 
   return {
     scene,
     skyboxMesh,
     bgLayer,
+    camera,
+    egg,
   };
 };
 
-type SceneData = ReturnType<typeof onSceneReady>;
+type ThenArg<T> = T extends PromiseLike<infer U> ? U : T;
+type SceneData = ThenArg<ReturnType<typeof onSceneReady>>;
 
 const onAREnabled = ({ scene, skyboxMesh, bgLayer }: SceneData) => {
   clearVideoStream();
@@ -108,12 +115,13 @@ const onARDisabled = ({ skyboxMesh, bgLayer }: SceneData) => {
   clearVideoStream();
 };
 
-const onRender = (scene: Scene) => {
+const onRender = ({ scene }: SceneData) => {
   scene.getEngine().resize();
 };
 
 const EggCanvas = ({ ar }: { ar?: boolean }) => {
-  const [sceneData, setSceneData] = React.useState<SceneData>();
+  const [sceneData, setSceneDataState] = React.useState<SceneData>();
+  const sceneDataRef = React.useRef<SceneData>();
   React.useEffect(() => {
     if (sceneData) {
       if (ar) {
@@ -123,16 +131,26 @@ const EggCanvas = ({ ar }: { ar?: boolean }) => {
       }
     }
   }, [ar, sceneData]);
+
+  function setSceneData(sceneData: SceneData) {
+    setSceneDataState(sceneData);
+    sceneDataRef.current = sceneData;
+  }
+
   return (
     <SceneComponent
       id="egg-canvas"
       antialias
       adaptToDeviceRatio
       onSceneReady={(scene) => {
-        const sceneData = onSceneReady(scene);
-        setSceneData(sceneData);
+        onSceneReady(scene).then(setSceneData);
       }}
-      onRender={onRender}
+      onRender={() => {
+        const sceneData = sceneDataRef.current; // We need to use the ref since this function doesn't seem to update on re-render
+        if (sceneData) {
+          onRender(sceneData);
+        }
+      }}
     />
   );
 };
