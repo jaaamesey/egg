@@ -43,7 +43,7 @@ const onSceneReady = (scene: Scene) => {
   const camera = new ArcRotateCamera('camera', 0, 1.5, 10, Vector3.Zero(), scene);
   camera.panningDistanceLimit = 2;
   camera.lowerRadiusLimit = 5;
-  camera.upperRadiusLimit = 25;
+  camera.upperRadiusLimit = 40;
   camera.setTarget(Vector3.Zero());
 
   const canvas = scene.getEngine().getRenderingCanvas();
