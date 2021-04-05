@@ -1,5 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
+import '@material/ripple/dist/mdc.ripple.min.css';
 import './index.css';
 import App from './app';
 

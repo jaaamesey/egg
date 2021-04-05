@@ -1,6 +1,5 @@
-import '@material/ripple/dist/mdc.ripple.min.css';
-import { MDCRipple } from '@material/ripple/component';
 import React from 'react';
+import { MDCRipple } from '@material/ripple/component';
 
 const activeColor = 'rgba(22, 80, 167, 0.8)';
 
