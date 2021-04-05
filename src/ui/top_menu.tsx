@@ -41,7 +41,7 @@ export const TopMenu = ({ ar, onARClicked }: { ar: boolean; onARClicked: () => v
         Icon={IoMdSettings}
         size={25}
         active={false}
-        onClick={() => console.log('NOT YET IMPLEMENTED')}
+        onClick={() => alert('NOT YET IMPLEMENTED')}
       />
     </div>
   );
