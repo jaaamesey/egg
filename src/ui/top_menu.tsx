@@ -1,6 +1,7 @@
 import React from 'react';
 import ARIcon from '../icons/ar';
 import { IoMdSettings } from 'react-icons/io';
+import { MDCRipple } from '@material/ripple';
 
 const getHoursAndMinutes = (date: Date) => ({
   hours: date.getHours(),
@@ -8,6 +9,35 @@ const getHoursAndMinutes = (date: Date) => ({
 });
 
 const initialTime = getHoursAndMinutes(new Date());
+
+const TopMenuButton = ({
+  children,
+  active,
+  onClick,
+}: {
+  children: React.ReactNode;
+  label: string;
+  active?: boolean;
+  onClick?: () => void;
+  className?: string;
+}) => {
+  const activeColor = 'rgba(22, 80, 167, 0.8)';
+  const activeStyle = {
+    color: activeColor,
+    ['--mdc-ripple-color' as any]: activeColor,
+  };
+
+  return (
+    <div
+      className={'transition-colors duration-50 mdc-ripple-surface'}
+      ref={(el) => el && MDCRipple.attachTo(el)}
+      onClick={onClick}
+      style={active ? activeStyle : undefined}
+    >
+      {children}
+    </div>
+  );
+};
 
 export const TopMenu = () => {
   const [hours, setHours] = React.useState(initialTime.hours);

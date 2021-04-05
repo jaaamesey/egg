@@ -1,10 +1,12 @@
 import React from 'react';
 import { CubeTexture } from '@babylonjs/core/Materials/Textures/cubeTexture';
 import { Texture } from '@babylonjs/core/Materials/Textures/texture';
+import { VideoTexture } from '@babylonjs/core/Materials/Textures/videoTexture';
 import { PBRMetallicRoughnessMaterial } from '@babylonjs/core/Materials/PBR/pbrMetallicRoughnessMaterial';
 import { ArcRotateCamera } from '@babylonjs/core/Cameras/arcRotateCamera';
 import { Vector3 } from '@babylonjs/core/Maths/math.vector';
 import { SceneLoader } from '@babylonjs/core/Loading/sceneLoader';
+import { Layer } from '@babylonjs/core/Layers/layer';
 import type { Scene } from '@babylonjs/core/scene';
 import '@babylonjs/core/Helpers/sceneHelpers';
 import '@babylonjs/loaders/glTF/2.0/Extensions/KHR_draco_mesh_compression';
@@ -22,7 +24,10 @@ SceneLoader.ShowLoadingScreen = false;
 const onSceneReady = (scene: Scene) => {
   const hdr = new CubeTexture(ForestEnv, scene);
 
-  scene.createDefaultSkybox(hdr, true, 1000, 0.088, true);
+  const skyboxMesh = scene.createDefaultSkybox(hdr, true, 1000, 0.088, true);
+  if (!skyboxMesh) throw new Error('Could not get skybox mesh');
+
+  const bgLayer = new Layer('bg', null, scene);
 
   const camera = new ArcRotateCamera('camera', 0, 1.5, 10, Vector3.Zero(), scene);
   camera.setTarget(Vector3.Zero());
@@ -43,7 +48,6 @@ const onSceneReady = (scene: Scene) => {
     egg.position.y = -1.25;
     egg.scaling = new Vector3(scale, scale, scale);
     egg.material = mat;
-    console.log(meshes);
     if (!canvas) {
       const message = 'Canvas is missing. This should never happen.';
       alert(message);
@@ -51,20 +55,49 @@ const onSceneReady = (scene: Scene) => {
     }
     canvas.classList.add('loaded');
   });
+
+  return {
+    scene,
+    skyboxMesh,
+    bgLayer,
+  };
+};
+
+type SceneData = ReturnType<typeof onSceneReady>;
+
+const onAREnabled = ({ scene, skyboxMesh, bgLayer }: SceneData) => {
+  skyboxMesh.visibility = 0;
+  VideoTexture.CreateFromWebCamAsync(scene, { advanced: [{ facingMode: 'environment' }] } as any)
+    .then((videoTexture) => {
+      bgLayer.texture = videoTexture;
+      bgLayer.texture.vScale = -1;
+    })
+    .catch((e) => alert('Unable to access camera: ' + e));
 };
 
 const onRender = (scene: Scene) => {
   scene.getEngine().resize();
 };
 
-const EggCanvas = () => {
+const EggCanvas = ({ ar }: { ar?: boolean }) => {
+  const [sceneData, setSceneData] = React.useState<SceneData>();
+  React.useEffect(() => {
+    if (sceneData) {
+      if (ar) {
+        onAREnabled(sceneData);
+      }
+    }
+  }, [ar, sceneData]);
   return (
     <SceneComponent
+      id="egg-canvas"
       antialias
       adaptToDeviceRatio
-      onSceneReady={onSceneReady}
+      onSceneReady={(scene) => {
+        const sceneData = onSceneReady(scene);
+        setSceneData(sceneData);
+      }}
       onRender={onRender}
-      id="egg-canvas"
     />
   );
 };

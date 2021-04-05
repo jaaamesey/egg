@@ -30,7 +30,7 @@ const App = () => {
               }}
             >
               <React.Suspense fallback={<div />}>
-                <EggCanvas />
+                <EggCanvas ar={true} />
               </React.Suspense>
             </div>
             <div
